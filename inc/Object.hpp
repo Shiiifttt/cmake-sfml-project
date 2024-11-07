@@ -7,9 +7,9 @@ class Object
 {
 
 private:
-	float	x;
-	float	y;
-	int	layer;
+	sf::Vector2f	position;
+	sf::Vector2f	old_position;
+	int		layer;
 
 	sf::Texture	tex;
 	sf::Sprite	spr;
@@ -17,12 +17,12 @@ private:
 	bool enabled;
 
 public:
-	Object(const float& x, const float& y, sf::Texture* tex);
+	Object(const sf::Vector2f& position, sf::Texture* tex);
 	~Object();
 
-	sf::Sprite*	getSprite();
-	void	drawSprite(sf::RenderWindow& window);
-	void	move(const sf::Vector2f& dir);
+	sf::Sprite*		getSprite();
+	void			drawSprite(sf::RenderWindow& window);
+	void			move(const sf::Vector2f& dir); // move to IMovement
 	virtual void	update(const float& deltaTime);
 	sf::Vector2f	getPosition();
 

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "Object.h"
-#include "IMovement.h"
+#include "Object.hpp"
+#include "IMovement.hpp"
 
 class Player : public Object, public IMovement
 {
@@ -13,11 +13,11 @@ class Player : public Object, public IMovement
 	int	face_dir;
 
 public:
-	Player(const float& x, const float& y, sf::Texture* tex, const float& movespeed);
-	void	input(const float& deltaTime);
-	void	shoot();
+	Player(const sf::Vector2f& position, sf::Texture* tex, const float& movespeed);
 
 	void	update(const float& deltaTime) override;
+	void	input(const float& deltaTime);
+	void	shoot();
 
 };
 

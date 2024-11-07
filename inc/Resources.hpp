@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "Object.h"
+#include "Object.hpp"
 
 class Resources {
 
@@ -15,7 +15,13 @@ class Resources {
 	sf::Texture	enemy_tex;
 	sf::Texture	bullet_tex;
 
-	std::vector<Object*>	sceneObjects;
+	std::vector<Object*>	scene_objects;
+
+	std::map<std::pair<int,int>, std::vector<Object*>>	world_grid;
+
+	int	partitions = 4;
+	int	partition_width;
+	int	partition_height;
 
 public:
 
@@ -24,18 +30,18 @@ public:
 	Resources& operator=(const Resources& r) = delete;
 	~Resources();
 
-	bool	loadResources();
+	bool			loadResources();
 	sf::Texture*	getPlayerTex();
 	sf::Texture*	getEnemyTex();
 	sf::Texture*	getBulletTex();
-	sf::Font*	getFont();
+	sf::Font*		getFont();
 
-	void	registerObject(Object* obj);
-	void	unregisterObject(Object* obj);
-	void	Resources::clean();
+	void					registerObject(Object* obj);
+	void					unregisterObject(Object* obj);
+	void					clean();
 	std::vector<Object*>	getSceneObjects();
 
-	static Resources& getInstance() {
+	static Resources&		getInstance() {
 		static Resources instance;
 		return instance;
 	};

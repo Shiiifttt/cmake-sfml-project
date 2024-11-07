@@ -1,7 +1,8 @@
 #include <SFML/Graphics.hpp>
-#include "Resources.h"
-#include "Object.h"
+#include "Resources.hpp"
+#include "Object.hpp"
 #include <iostream>
+#include "Utils.hpp"
 
 const std::string Resources::player_spr = "assets/images/blue.png";
 const std::string Resources::enemy_spr = "assets/images/red.png";
@@ -13,7 +14,9 @@ Resources::Resources() {
 }
 
 Resources::~Resources() {
+
 	clean();
+
 }
 
 bool	Resources::loadResources() {
@@ -55,17 +58,13 @@ sf::Font*	Resources::getFont() {
 
 void	Resources::registerObject(Object* obj) {
 
-	//std::cout << "register new object" << std::endl;
-
-	sceneObjects.push_back(obj);
+	scene_objects.push_back(obj);
 
 }
 
 void	Resources::unregisterObject(Object* obj) {
 
-	//std::cout << "unregister object" << std::endl;
-
-	sceneObjects.erase(std::remove(sceneObjects.begin(), sceneObjects.end(), obj), sceneObjects.end());
+	scene_objects.erase(std::remove(scene_objects.begin(), scene_objects.end(), obj), scene_objects.end());
 
 }
 
@@ -77,6 +76,7 @@ void	Resources::clean() {
 }
 
 std::vector<Object*>	Resources::getSceneObjects() {
-	return sceneObjects;
-}
 
+	return scene_objects;
+
+}

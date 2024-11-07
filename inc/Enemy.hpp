@@ -1,8 +1,8 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "Object.h"
-#include "IMovement.h"
+#include "Object.hpp"
+#include "IMovement.hpp"
 
 class Enemy : public Object, public IMovement
 {
@@ -14,10 +14,11 @@ class Enemy : public Object, public IMovement
 	Object* target;
 
 public:
-	Enemy(const float& x, const float& y, sf::Texture* tex, const float& movespeed, const int& maxHealth);
-	void update(const float& deltaTime) override;
+	Enemy(const sf::Vector2f& position, sf::Texture* tex, const float& movespeed, const int& maxHealth);
 
+	void	update(const float& deltaTime) override;
 	void	setTarget(Object* obj);
 	void	takeDamage(const int& damage);
+	void	onDeath();
 
 };

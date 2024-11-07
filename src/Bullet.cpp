@@ -1,22 +1,21 @@
 
 #include <SFML/Graphics.hpp>
-#include "Object.h"
-#include "Bullet.h"
-#include "IMovement.h"
-#include "Resources.h"
-#include "Enemy.h"
-#include "Utils.h"
+#include "Object.hpp"
+#include "Bullet.hpp"
+#include "IMovement.hpp"
+#include "Resources.hpp"
+#include "Enemy.hpp"
+#include "Utils.hpp"
 
 #include <iostream>
 
-Bullet::Bullet(const float& x, const float& y, sf::Texture* tex, const float& movespeed, const sf::Vector2f& dir, const float& lifetime, const int& damage) : Object(x, y, tex), dir(dir), lifetime(lifetime), damage(damage) {
+Bullet::Bullet(const sf::Vector2f& position, sf::Texture* tex, const float& movespeed, const sf::Vector2f& dir, const float& lifetime, const int& damage) : Object(position, tex), dir(dir), lifetime(lifetime), damage(damage) {
+
 	setMovespeed(movespeed);
+
 };
 
 void	Bullet::update(const float& deltaTime) {
-
-	if (!isEnabled())
-		return;
 
 	if (collisionCheck())
 		return;
@@ -36,14 +35,17 @@ void	Bullet::update(const float& deltaTime) {
 bool	Bullet::collisionCheck() {
 
 	Enemy* target = nullptr;
+	sf::Vector2f	pos = getPosition();
 
 	Resources& resources = Resources::getInstance();
 	std::vector<Object*> allObjects = resources.getSceneObjects();
 
-	sf::Vector2f	pos = getPosition();
+	if (allObjects.empty())
+		return false;
+
 	sf::Vector2f	target_pos;
 
-	for (auto obj : allObjects) {
+	for (auto obj : allObjects) { // O(n^2), find a better way
 		if (Enemy* enemy = dynamic_cast<Enemy*>(obj)) {
 
 			// Make better overlap check

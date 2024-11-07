@@ -1,15 +1,17 @@
 
 #include <SFML/Graphics.hpp>
-#include "Player.h"
-#include "Utils.h"
-#include "Bullet.h"
-#include "Resources.h"
-#include "Enemy.h"
+#include "Player.hpp"
+#include "Utils.hpp"
+#include "Bullet.hpp"
+#include "Resources.hpp"
+#include "Enemy.hpp"
 
 #include <iostream>
 
-Player::Player(const float& x, const float& y, sf::Texture* tex, const float& movespeed) : Object(x, y, tex), face_dir(1), shootInterval(0.2f), shootTimer(0), bulletDamage(1) {
+Player::Player(const sf::Vector2f& position, sf::Texture* tex, const float& movespeed) : Object(position, tex), face_dir(1), shootInterval(0.2f), shootTimer(0), bulletDamage(1) {
+
 	setMovespeed(movespeed);
+
 };
 
 void	Player::input(const float& deltaTime) {
@@ -68,7 +70,7 @@ void	Player::shoot() {
 			target_pos = enemy->getPosition();
 			float dist = distance(pos, target_pos);
 
-			//if (dist > 200.f) Range
+			//if (dist > 200.f)
 			//	continue;
 
 			if (dist < closest) {
@@ -84,6 +86,6 @@ void	Player::shoot() {
 	target_pos = target->getPosition();
 
 	sf::Vector2f	bullet_dir = normalize(target_pos - pos);
-	Bullet*	bullet = new Bullet(pos.x, pos.y, resources.getBulletTex(), 600.f, bullet_dir, 2.f, bulletDamage);
+	Bullet*	bullet = new Bullet(pos, resources.getBulletTex(), 600.f, bullet_dir, 2.f, bulletDamage);
 
 }

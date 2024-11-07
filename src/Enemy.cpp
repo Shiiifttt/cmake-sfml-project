@@ -1,18 +1,17 @@
 #include <SFML/Graphics.hpp>
-#include "Enemy.h"
-#include "Utils.h"
+#include "Enemy.hpp"
+#include "Utils.hpp"
 
 const float Enemy::chaseTreshold = 16.f;
 
-Enemy::Enemy(const float& x, const float& y, sf::Texture* tex, const float& movespeed, const int& maxHealth) : Object(x, y, tex), target(nullptr), maxHealth(maxHealth) {
+Enemy::Enemy(const sf::Vector2f& position, sf::Texture* tex, const float& movespeed, const int& maxHealth) : Object(position, tex), target(nullptr), maxHealth(maxHealth) {
+
 	setMovespeed(movespeed);
 	health = maxHealth;
+
 };
 
 void	Enemy::update(const float& deltaTime) {
-
-	if (!isEnabled())
-		return;
 
 	if (target == nullptr)
 		return;
@@ -28,14 +27,23 @@ void	Enemy::update(const float& deltaTime) {
 }
 
 void	Enemy::setTarget(Object* obj) {
+
 	target = obj;
+
 }
 
 void	Enemy::takeDamage(const int& damage) {
+
 	health -= damage;
+
 	if (health <= 0)
-	{
-		// TODO: Pool this instead of delete
-		delete this;
-	}
+		onDeath();
+
+}
+
+void	Enemy::onDeath() {
+
+	// TODO: Pool this instead of delete
+	delete this;
+
 }
