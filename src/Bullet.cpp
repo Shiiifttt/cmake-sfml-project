@@ -6,6 +6,7 @@
 #include "Resources.hpp"
 #include "Enemy.hpp"
 #include "Utils.hpp"
+#include "IDamage.hpp"
 
 #include <iostream>
 
@@ -38,14 +39,14 @@ bool	Bullet::collisionCheck() {
 	sf::Vector2f	pos = getPosition();
 
 	Resources& resources = Resources::getInstance();
-	std::vector<Object*> allObjects = resources.getSceneObjects();
+	std::vector<IDamage*> dmgInterfaces = resources.getDamageInterfaces();
 
-	if (allObjects.empty())
+	if (dmgInterfaces.empty())
 		return false;
 
 	sf::Vector2f	target_pos;
 
-	for (auto obj : allObjects) { // O(n^2), find a better way
+	for (auto obj : dmgInterfaces) { // O(n^2), find a better way
 		if (Enemy* enemy = dynamic_cast<Enemy*>(obj)) {
 
 			// Make better overlap check
@@ -62,6 +63,7 @@ bool	Bullet::collisionCheck() {
 		return false;
 
 	target->takeDamage(damage);
+	resources.playHitSound();
 
 	// TODO: Pool this instead of delete
 	delete this;

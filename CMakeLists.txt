@@ -13,9 +13,10 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(main src/main.cpp src/Object.cpp src/Player.cpp src/Enemy.cpp src/IMovement.cpp src/Utils.cpp src/Resources.cpp src/Bullet.cpp)
-target_link_libraries(main PRIVATE sfml-graphics)
+add_executable(main src/main.cpp src/Object.cpp src/Player.cpp src/Enemy.cpp src/IMovement.cpp src/Utils.cpp src/Resources.cpp src/Bullet.cpp src/Camera.cpp src/Game.cpp)
+target_link_libraries(main PRIVATE sfml-graphics sfml-audio)
 target_compile_features(main PRIVATE cxx_std_17)
+include_directories(${CMAKE_SOURCE_DIR}/inc)
 
 if(WIN32)
     add_custom_command(

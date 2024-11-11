@@ -89,3 +89,10 @@ void	Player::shoot() {
 	Bullet*	bullet = new Bullet(pos, resources.getBulletTex(), 600.f, bullet_dir, 2.f, bulletDamage);
 
 }
+
+void	Player::takeDamage(const int& damage) {
+	// health -= damage;
+
+	// if (health <= 0)
+	// 	onDeath();
+}

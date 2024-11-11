@@ -1,73 +1,124 @@
 #include <SFML/Graphics.hpp>
-#include "Object.hpp"
-#include "Player.hpp"
-#include "Enemy.hpp"
+#include "Game.hpp"
 #include "Resources.hpp"
+#include "Object.hpp"
+#include "Enemy.hpp"
+#include "Player.hpp"
 #include "Utils.hpp"
 #include "Camera.hpp"
+#include <thread>
+#include <iostream>
+#include <cmath>
+
+void	renderLoop(Game* game) {
+
+	game->getWindow().setActive(true);
+	Resources& resources = Resources::getInstance();
+
+	sf::Text	text = newText(sf::Vector2f(400, 24), "Use WASD to move!", resources.getFont(), 24, sf::Color::White, sf::Text::Bold, font_align::H_CENTER);
+	sf::Text	pause = newText(sf::Vector2f(400, 300), "Game is paused (space)", resources.getFont(), 24, sf::Color::White, sf::Text::Bold, font_align::H_CENTER);
+
+	float spawn_timer = 0.f;
+	float spawn_interval = 2.f;
+	float timeElapsed = 0.f;
+	const double pi = 3.14159265358979323846;
+	const float frequency = 0.5f;
+
+	while (game->isRunning()) {
+
+		if (game->getGameState() == GameState::Play) {
+
+			float deltaTime = game->getClock().restart().asSeconds();
+			timeElapsed += deltaTime;
+
+			spawn_timer += deltaTime;
+			if (spawn_timer >= spawn_interval)
+			{
+				sf::Vector2f	position;
+
+				do {
+					position = sf::Vector2f(rand() % 800, rand() % 600);
+				} while (distance(game->getPlayer()->getPosition(), position) < 400.f);
+
+				Enemy* enemy = new Enemy(position, resources.getEnemyTex(), 50.f, 10);
+				enemy->setTarget(game->getPlayer());
+				spawn_timer = 0;
+			}
+
+			for (auto obj : resources.getSceneObjects()) {
+				if (obj->isEnabled())
+					obj->update(deltaTime);
+			}
+
+		}
+
+		game->getWindow().clear();
+
+		for (auto obj : resources.getSceneObjects()) {
+			if (game->getCamera().pointInsideView(obj->getPosition()))
+				obj->drawSprite(game->getWindow());
+		}
+
+		game->getWindow().draw(text);
+
+		if (game->getGameState() == GameState::Pause)
+			game->getWindow().draw(pause);
+
+		game->getWindow().display();
+
+	}
+
+}
 
 int main() {
 
-    auto window = sf::RenderWindow({800u, 600u}, "A game of all time");
-    window.setFramerateLimit(144);
+	sf::RenderWindow window = sf::RenderWindow({ 800u, 600u }, "A game of all time");
+	window.setFramerateLimit(144);
+	window.setActive(false);
 
-	sf::Clock clock;
+	Game	game(window);
 
-	Resources& resources = Resources::getInstance();
-	if (!resources.loadResources())
+	if (!game.initSuccess()) {
+		std::cout << "Press Enter to exit...";
+		std::cin.get(); // Waits for the user to press Enter
 		return EXIT_FAILURE;
+	}
 
-	Camera camera = Camera(sf::Vector2f(800, 600), 128);
-	camera.setPosition(sf::Vector2f(400, 300));
+	std::thread	render(renderLoop, &game);
 
-    Player*	player = new Player(sf::Vector2f(400, 300), resources.getPlayerTex(), 200.f);
-    Enemy*	enemy = new Enemy(sf::Vector2f(64,64), resources.getEnemyTex(), 50.f, 10);
-	enemy->setTarget(player);
-
-	sf::Text text = newText(sf::Vector2f(400, 24), "Use WASD to move!", resources.getFont(), 24, sf::Color::White, sf::Text::Bold, font_align::H_CENTER);
-
-	const float	spawn_internval = 2.f;
-	float	spawn_timer = 0.f;
-
-    while (window.isOpen())
+    while (game.getWindow().isOpen())
     {
-        for (auto event = sf::Event(); window.pollEvent(event);)
+        for (auto event = sf::Event(); game.getWindow().pollEvent(event);)
         {
-            if (event.type == sf::Event::Closed)
-                window.close();
+			if (event.type == sf::Event::KeyPressed) {
+				if (event.key.code == sf::Keyboard::Escape) {
+					game.closeGame();
+					break;
+				}
+				else if (event.key.code == sf::Keyboard::Space) {
+					GameState state = game.getGameState();
+					if (state == GameState::Play) {
+						std::cout << "pause" << std::endl;
+						game.setGameState(GameState::Pause);
+					} else {
+						game.unpause();
+						std::cout << "unpause" << std::endl;
+						game.setGameState(GameState::Play);
+					}
+				}
+			}
+            if (event.type == sf::Event::Closed) {
+				game.closeGame();
+				break;
+			}
         }
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-			window.close();
-
-		float deltaTime = clock.restart().asSeconds();
-
-		spawn_timer += deltaTime;
-		if (spawn_timer >= spawn_internval)
-		{
-			//Enemy* enemy = new Enemy(sf::Vector2f(64, 64), resources.getEnemyTex(), 50.f, 10);
-			//enemy->setTarget(player);
-			spawn_timer = 0;
-		}
-
-		for (auto obj : resources.getSceneObjects()) {
-			if (obj->isEnabled())
-				obj->update(deltaTime);
-		}
-
-        window.clear();
-
-		for (auto obj : resources.getSceneObjects()) {
-			if (camera.pointInsideView(obj->getPosition()))
-				obj->drawSprite(window);
-		}
-
-		window.draw(text);
-        window.display();
     }
 
-	resources.clean();
+	render.join();
 
+	std::cout << "Press Enter to exit...";
+	std::cin.get(); // Waits for the user to press Enter
 	return EXIT_SUCCESS;
 }
 
